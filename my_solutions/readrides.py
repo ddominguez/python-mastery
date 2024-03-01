@@ -36,7 +36,7 @@ def read_rides_as_dicts(filename):
 
 # class Row:
 #     __slots__ = ["route", "date", "daytype", "rides"]
-#
+
 #     def __init__(self, route, date, daytype, rides):
 #         self.route = route
 #         self.date = date
@@ -44,7 +44,7 @@ def read_rides_as_dicts(filename):
 #         self.rides = rides
 
 
-# Uncomment to use a namedtuple instead
+# use namedtuple
 from collections import namedtuple
 
 Row = namedtuple("Row", ("route", "date", "daytype", "rides"))
