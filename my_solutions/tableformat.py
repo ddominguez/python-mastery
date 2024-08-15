@@ -7,13 +7,20 @@ Exercise 3.2
 
 Exercise 3.5
 - added TableFormatter classes
+
+Exercise 3.7
+- convert TableFormatter to abstract base class
 """
 
+from abc import ABC, abstractmethod
 
-class TableFormatter:
+
+class TableFormatter(ABC):
+    @abstractmethod
     def headings(self, headers):
         raise NotImplementedError
 
+    @abstractmethod
     def row(self, rowdata):
         raise NotImplementedError
 
@@ -27,7 +34,7 @@ class TextTableFormatter(TableFormatter):
         print(" ".join(f"{d:>10}" for d in rowdata))
 
 
-class CSVTableFormatter:
+class CSVTableFormatter(TableFormatter):
     def headings(self, headers):
         print(",".join(h for h in headers))
 
@@ -35,7 +42,7 @@ class CSVTableFormatter:
         print(",".join(f"{d}" for d in rowdata))
 
 
-class HTMLTableFormatter:
+class HTMLTableFormatter(TableFormatter):
     def headings(self, headers):
         print("<tr>", " ".join(f"<th>{h}</th>" for h in headers), "</tr>")
 
@@ -58,6 +65,8 @@ def create_formatter(name: str):
 
 def print_table(records, fields, formatter):
     """Prints a nicely formatted table."""
+    if not isinstance(formatter, TableFormatter):
+        raise TypeError("expected a TableFormatter")
     formatter.headings(fields)
     for r in records:
         rowdata = [getattr(r, fieldname) for fieldname in fields]
