@@ -11,6 +11,9 @@ Exercise 3.4
 - enforce validation for shares and price
 - restrictes attr names using slots
 - update property definition to use _types
+
+Exercise 3.6
+- added __repr__() and __eq__()
 """
 
 
@@ -27,6 +30,17 @@ class Stock:
         self.name = name
         self.shares = shares
         self.price = price
+
+    def __repr__(self):
+        return (
+            f"{type(self).__name__}('{self.name!r}', {self.shares!r}, {self.price!r})"
+        )
+
+    def __eq__(self, other):
+        return isinstance(other, Stock) and (
+            (self.name, self.shares, self.price)
+            == (other.name, other.shares, other.price)
+        )
 
     @property
     def shares(self):
