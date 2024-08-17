@@ -10,9 +10,25 @@ Exercise 3.5
 
 Exercise 3.7
 - convert TableFormatter to abstract base class
+
+Exercise 3.8
+- added format mixins
 """
 
 from abc import ABC, abstractmethod
+
+
+class ColumnFormatMixin:
+    formats = []
+
+    def row(self, rowdata):
+        rowdata = [(fmt % d) for fmt, d in zip(self.formats, rowdata)]
+        super().row(rowdata)
+
+
+class UpperHeadersMixin:
+    def headings(self, headers):
+        super().headings([h.upper() for h in headers])
 
 
 class TableFormatter(ABC):
@@ -50,7 +66,7 @@ class HTMLTableFormatter(TableFormatter):
         print("<tr>", " ".join(f"<td>{d}</td>" for d in rowdata), "</tr>")
 
 
-def create_formatter(name: str):
+def create_formatter(name, column_formats=None, upper_headers=False):
     """Returns a table formatter."""
     if name == "text":
         formatter_cls = TextTableFormatter
@@ -60,6 +76,17 @@ def create_formatter(name: str):
         formatter_cls = HTMLTableFormatter
     else:
         raise ValueError("expected text, csv, or html")
+
+    if column_formats:
+
+        class formatter_cls(ColumnFormatMixin, formatter_cls):
+            formats = column_formats
+
+    if upper_headers:
+
+        class formatter_cls(UpperHeadersMixin, formatter_cls):
+            pass
+
     return formatter_cls()
 
 
