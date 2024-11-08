@@ -3,11 +3,25 @@ Python Mastery
 
 Exercise 4.2
 - Add Validator classes
+
+Exercise 4.3
+- Added descriptor to Validator
 """
+
+
 class Validator:
+    def __init__(self, name=None):
+        self.name = name
+
+    def __set_name__(self, cls, name):
+        self.name = name
+
     @classmethod
     def check(cls, value):
         return value
+
+    def __set__(self, instance, value):
+        instance.__dict__[self.name] = self.check(value)
 
 
 class Typed(Validator):
@@ -58,3 +72,26 @@ class PositiveFloat(Float, Positive):
 
 class NonEmptyString(String, NonEmpty):
     pass
+
+
+if __name__ == "__main__":
+
+    class Stock:
+        name = NonEmptyString()
+        shares = PositiveInteger()
+        price = PositiveFloat()
+
+        def __init__(self, name, shares, price):
+            self.name = name
+            self.shares = shares
+            self.price = price
+
+        def __repr__(self):
+            return f"Stock({self.name!r}, {self.shares!r}, {self.price!r})"
+
+        @property
+        def cost(self):
+            return self.shares * self.price
+
+        def sell(self, nshares):
+            self.shares -= nshares
