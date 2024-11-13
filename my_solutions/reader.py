@@ -11,6 +11,10 @@ Exercise 3.7
 Exercise 5.1
 - revert to simple functions
 - added type hints
+
+Exercise 5.3
+- added convert_csv
+- updated csv_as_ funcs to use convert_csv func
 """
 
 import csv
@@ -26,28 +30,29 @@ def csv_as_dicts(
     """
     Convert CSV file data into a list of dictionaries with optional type conversion.
     """
-    records = []
-    rows = csv.reader(file)
-    if headers is None:
-        headers = next(rows)
-    for row in rows:
-        record = {name: func(val) for name, func, val in zip(headers, types, row)}
-        records.append(record)
-    return records
+
+    def convert_func(headers, row):
+        return {name: func(val) for name, func, val in zip(headers, types, row)}
+
+    return convert_csv(file, convert_func, headers)
 
 
 def csv_as_instances(file: TextIO, cls, headers=None):
     """
     Convert CSV file data into a list of instances.
     """
-    records = []
-    rows = csv.reader(file)
+
+    def convert_func(headers, row):
+        return cls.from_row(row)
+
+    return convert_csv(file, convert_func, headers)
+
+
+def convert_csv(lines, convert_func, headers=None):
+    rows = csv.reader(lines)
     if headers is None:
         headers = next(rows)
-    for row in rows:
-        record = cls.from_row(row)
-        records.append(record)
-    return records
+    return [convert_func(headers, row) for row in rows]
 
 
 def read_csv_as_dicts(
