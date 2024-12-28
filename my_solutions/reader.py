@@ -15,11 +15,17 @@ Exercise 5.1
 Exercise 5.3
 - added convert_csv
 - updated csv_as_ funcs to use convert_csv func
+
+Exercise 5.5
+- added error handling to convert csv
 """
 
 import csv
+import logging
 from collections.abc import Callable
 from typing import TextIO
+
+log = logging.getLogger(__name__)
 
 
 def csv_as_dicts(
@@ -52,7 +58,14 @@ def convert_csv(lines, convert_func, headers=None):
     rows = csv.reader(lines)
     if headers is None:
         headers = next(rows)
-    return [convert_func(headers, row) for row in rows]
+    result = []
+    for row_num, row in enumerate(rows, start=1):
+        try:
+            result.append(convert_func(headers, row))
+        except ValueError as e:
+            log.warning(f"Row {row_num}: Bad row: {row}")
+            log.debug(f"Row {row_num}: Reason: {e}")
+    return result
 
 
 def read_csv_as_dicts(
